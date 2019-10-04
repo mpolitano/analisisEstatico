@@ -51,17 +51,10 @@ ComentarioLinea= "//".*\n
 <YYINITIAL> {
     /* Regresa que el token la palabra reservada. */
 
-    "break" {   return symbol(sym.BREAK, new BreakStmt(yyline,yycolumn));}
-    "class" {  return  symbol(sym.CLASS);   }
-    "continue" {  return  symbol(sym.CONTINUE,new ContinueStmt(yyline,yycolumn));   }
     "else" {  return  symbol(sym.ELSE);   }
-    "false" {  return  symbol(sym.FALSE, new BooleanLiteral(false,yyline,yycolumn));   }
-    "for" {  return  symbol(sym.FOR); }
     "if" {  return  symbol(sym.IF);   }
     "return" {  return  symbol(sym.RETURN,new ReturnStmt(yyline,yycolumn));   }
-    "true" {  return  symbol(sym.TRUE,new BooleanLiteral(true,yyline,yycolumn));   }
     "while" {  return  symbol(sym.WHILE);   }
-    "externinvk" {  return  symbol(sym.EXTERNINVK);   }
 
     // Comentarios 
     {ComentarioLinea} { }
@@ -72,25 +65,10 @@ ComentarioLinea= "//".*\n
 
     //Op_Aritemetico. 
     "+" {  return  symbol(sym.PLUS, BinOpType.PLUS);   }
-    "-" {  return  symbol(sym.SUB, BinOpType.MINUS);   }
-    "*" {  return  symbol(sym.MULT, BinOpType.MULTIPLY);   }
-    "/" {  return  symbol(sym.DIVI,BinOpType.DIVIDE);   }
-    "%" {  return  symbol(sym.MOD,BinOpType.MOD);   }
 
-    //Operador Relacional
-    "<" {  return  symbol(sym.LOWER,BinOpType.LE);   }
-    ">" {  return  symbol(sym.HIGHER,BinOpType.GE);   }
-    ">=" {  return  symbol(sym.HIGHEREQUAL,BinOpType.GEQ);   }
-    "<=" {  return  symbol(sym.LOWEREQUAL,BinOpType.LEQ);   }
-    
-    //Operador relacional
-    "==" {  return  symbol(sym.EQUAL,BinOpType.CEQ);   }  
-    "!=" {  return  symbol(sym.DIFFERENT,BinOpType.NEQ);   }
 
     //Asignaciones
     "=" {  return  symbol(sym.ASSIG, AssignOpType.ASSIGN);}  
-    "+=" {  return  symbol(sym.ASSIGPLUS,AssignOpType.INCREMENT);   }
-    "-=" {  return  symbol(sym.ASSIGSUB,AssignOpType.DECREMENT);   }
 
     //Condicionales
     "&&" {  return  symbol(sym.AND,BinOpType.AND);   }
@@ -105,9 +83,7 @@ ComentarioLinea= "//".*\n
 
     //Tipos
     "int" {Type t=Type.INT; return symbol(sym.RESERV_INT,t);}
-    "float" {Type t=Type.FLOAT; return symbol(sym.RESERV_FLOAT,t);}
-    "boolean" {Type t=Type.BOOLEAN; return symbol(sym.RESERV_BOOLEAN,t);}
-    "void" {  Type t= Type.VOID; return  symbol(sym.VOID,t); }
+
     
     //Llaves.
     "{" {  return  symbol(sym.LLAB);   }
