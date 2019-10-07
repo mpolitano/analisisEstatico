@@ -9,6 +9,9 @@ import ctds_pcr.semcheck.BreakContinueCheckVisitor;
 import ctds_pcr.intermediateCode.TACVisitor;
 import ctds_pcr.codeGeneration.*;
 import ctds_pcr.optimization.*;
+
+
+
 //{: symTable=new SymbolTable(); symTable.pushLevel(); symTable.addSymbolToLevel(ID); :}   
 /* Codigo del parser, se copia integramente a la clase final.
     Agregamos el manejo de errores. */
@@ -130,20 +133,19 @@ parser code{:
     //     System.exit(1); //Interrumpo la ejecucion
     // }
   
-:}
+:};
 
 init with {:  
-TYPE             
              //We Can't use this block for parser variables inicialization, we should do this in a extra-rule called "begin"
-          :}
+          :};
 
   
    
 // Terminales (tokens obtenidos por el analizador lexico).  
 
-terminal  ELSE, IF, PARENIZQ, PARENDER, COMA,LLAB, LLCER, CORAB, CORCER;
+terminal  ELSE, IF, PARENIZQ, PARENDER,LLAB, LLCER, CORAB, CORCER, WHILE;
 
-terminal String  ID;
+terminal Location ID;
 terminal RESERV_INT;
 terminal IntLiteral INT;
 terminal SecStmt PUNTOCOMA;
@@ -159,7 +161,16 @@ non terminal LinkedList<Statement> STATAMENT_STAR;
 non terminal Statement STATAMENT;
 non terminal Block ELSE_OPTIONAL;
 non terminal AssignOpType ASSING_OP;
-non terminal Expression EXPR
+non terminal Expression EXPR;
+non terminal Expression PROGRAM;
+non terminal RefLocation LOCATION; 
+
+
+precedence left  ELSE,IF;
+precedence left  PUNTOCOMA;
+
+precedence left  PLUS,RETURN,WHILE,ID;
+
 
 // -------------Seccion de predencia y asociacion de los terminales----------- 
 
@@ -168,43 +179,38 @@ non terminal Expression EXPR
    
 // La gramatica 
 
+// TYPE ::=     {: symTable= new SymbolTable();
+//                symTable.pushLevel(); //Push "global" level 
+//               :} PROGRAM:p{:RESULT=p;:} ; //ver chequear
 
-start with TYPE;
-
-TYPE ::=     {: symTable= new SymbolTable();
-               symTable.pushLevel(); //Push "global" level 
-              :} PROGRAM:p{:RESULT=p;:} ; //ver chequear
-
-PROGRAM ::=             TYPE ID:ide LLAB STATEMENTS:listField LLCER {: 
+PROGRAM ::=             TYPE ID:ide LLAB STATAMENT_STAR:listField LLCER {: 
                                   RESULT= new Program(ide.getId(),listField, listMehod);
                                 :};
-              					
+TYPE ::=                 RESERV_INT:t {:RESULT=t;:};
+			
 
 
 
-STATAMENT_STAR  ::=     STATAMENT:s {:RESULT=listStatament;:} 
+STATAMENT_STAR  ::=     STATAMENT:s {:RESULT=new LinkedList<Statement>();:} 
                         | STATAMENT:s STATAMENT_STAR:listStatament {: listStatament.addFirst(s); RESULT=listStatament;:};
 
 
-TYPE ::=                 RESERV_INT:t {:RESULT=t;:};
 
 
 
 STATAMENT ::= 	        LOCATION:id ASSING_OP:op EXPR:expr PUNTOCOMA{:RESULT= new AssignStmt(id,op,expr,expr.getLineNumber(),expr.getColumnNumber());:}
                 				| IF PARENIZQ EXPR:boolExpr PARENDER STATAMENT_STAR:b ELSE_OPTIONAL:else_optional{:RESULT= new IfStmt(boolExpr,b,else_optional,boolExpr.getLineNumber(),boolExpr.getColumnNumber());:}
               			    | WHILE EXPR:boolExpr STATAMENT_STAR:body{:RESULT= new WhileStmt(boolExpr,body,boolExpr.getLineNumber(),boolExpr.getColumnNumber());:}
-              			    | RETURN:rt EXPR_OPTIONAL:expr PUNTOCOMA{:rt.setExpression(expr); RESULT=rt ;:} 
+              			    | RETURN:rt EXPR:expr PUNTOCOMA{:rt.setExpression(expr); RESULT=rt ;:} 
               			    | PUNTOCOMA:s{:RESULT=s;;:};
 
 
 ELSE_OPTIONAL  ::=      ELSE STATAMENT_STAR:b{:RESULT= b;:}
 			               		|{:RESULT= null;:} ;					
 
-EXPR_OPTIONAL  ::=	   EXPR:expr {:RESULT=expr;:}
-					             | {:RESULT=null;:};  
 
 
-ASSING_OP  ::=         ASSIG:asign{: RESULT=asign;:} ;
+ASSING_OP  ::=         ASSIG:asign{: RESULT=asign;:};
 
 
 
@@ -233,8 +239,6 @@ LOCATION  ::=           ID:id
 
 
 EXPR  ::= 		          LOCATION:l {:RESULT=l;:}
-                				| LITERAL:l{:RESULT= l;:}             			
+                				| INT:l{:RESULT= l;:}             			
                         | EXPR:lexpr PLUS:op EXPR:rexpr{:RESULT= new BinOpExpr(lexpr,op,rexpr,lexpr.getLineNumber(),lexpr.getColumnNumber());:} ;
 
-
-LITERAL  ::=            INT:i {:RESULT=i;:};
