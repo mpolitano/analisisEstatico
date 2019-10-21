@@ -1,7 +1,7 @@
 package parser;
 import java_cup.runtime.*;
 import java.io.Reader;
-import ctds_pcr.ast.*;      
+import ast.*;      
 %% //inicio de opciones
       
 /* 
@@ -53,7 +53,7 @@ ComentarioLinea= "//".*\n
 
     "else" {  return  symbol(sym.ELSE);   }
     "if" {  return  symbol(sym.IF);   }
-    "return" {  return  symbol(sym.RETURN,new ReturnStmt(yyline,yycolumn));   }
+    "return" {  return  symbol(sym.RETURN,new ReturnStmt());   }
     "while" {  return  symbol(sym.WHILE);   }
 
     // Comentarios 
@@ -70,16 +70,11 @@ ComentarioLinea= "//".*\n
     //Asignaciones
     "=" {  return  symbol(sym.ASSIG, AssignOpType.ASSIGN);}  
 
-    //Condicionales
-    "&&" {  return  symbol(sym.AND,BinOpType.AND);   }
-    "||" {  return  symbol(sym.OR,BinOpType.OR);   }
-     "!" {  return  symbol(sym.NEG,UnaryOpType.NOT);   }
 
     //Delimitadores
     "(" {  return  symbol(sym.PARENIZQ);   }
     ")" {  return  symbol(sym.PARENDER);   }
-    ";" {  return  symbol(sym.PUNTOCOMA, new SecStmt(yyline,yycolumn));}
-    "," {  return  symbol(sym.COMA);   }
+    ";" {  return  symbol(sym.PUNTOCOMA); }
 
     //Tipos
     "int" {Type t=Type.INT; return symbol(sym.RESERV_INT,t);}
@@ -92,14 +87,13 @@ ComentarioLinea= "//".*\n
     "]" {  return  symbol(sym.CORCER);   }
 
     //Identificador  
-    {Alpha} ({Alpha}|{Digit})* {VarLocation value= new VarLocation(yytext(),yyline,yycolumn);
-                                return symbol(sym.ID,value);   
+    {Alpha} ({Alpha}|{Digit})* {
+    //VarLocation value= new VarLocation(yytext(),yyline,yycolumn);
+                                return symbol(sym.ID);   
                                 }
 
     //Literales
-    {Digit}{Digit}* {  return symbol(sym.INT,new IntLiteral(yytext(),yyline,yycolumn));   }
-    {Digit} {Digit}* "." {Digit} {Digit}* {  return symbol(sym.FLOAT, new FloatLiteral(yytext(),yyline,yycolumn));   }
-    "\""{ASCII}*"\"" {  return symbol(sym.STRING, new StringLiteral(yytext(),yyline,yycolumn));  }
+    {Digit}{Digit}* {  return symbol(sym.INT,new IntLiteral(yytext()));   }
     "/*"        {yybegin(COMENTARIO);     }
 
       .   {   System.out.println ("Caracter ilegal!!!   " + yytext() + " en linea " + yyline + " columna " + yycolumn);

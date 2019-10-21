@@ -1,0 +1,92 @@
+package parser;
+import java_cup.runtime.*;
+import java.io.FileReader;
+import ast.*;
+import java.util.*;
+import ASTVisitor;
+
+
+
+
+init with {:  
+             //We Can't use this block for parser variables inicialization, we should do this in a extra-rule called "begin"
+          :};
+
+  
+   
+// Terminales (tokens obtenidos por el analizador lexico).  
+
+terminal  ELSE, IF, PARENIZQ, PARENDER,LLAB, LLCER, CORAB, CORCER, WHILE;
+
+terminal String ID;
+terminal RESERV_INT;
+terminal IntLiteral INT;
+terminal PUNTOCOMA;
+terminal AssignOpType ASSIG;
+terminal BinOpType  PLUS;
+terminal ReturnStmt RETURN;
+
+
+// No Terminales (producciones).  
+                        
+non terminal Type TYPE;
+non terminal LinkedList<Statement> STATAMENT_STAR;
+non terminal Statement STATAMENT;
+non terminal Block ELSE_OPTIONAL;
+non terminal AssignOpType ASSING_OP;
+non terminal Expression EXPR;
+non terminal Program PROGRAM;
+
+
+precedence left  ELSE,IF;
+precedence left  PUNTOCOMA;
+
+precedence left  PLUS,RETURN,WHILE,ID;
+
+
+// -------------Seccion de predencia y asociacion de los terminales----------- 
+
+
+// ------------------- Seccion de la gramatica ------------------------ 
+   
+// La gramatica 
+
+
+start with PROGRAM;
+
+
+PROGRAM ::=             TYPE:t ID:id LLAB STATAMENT_STAR:listField LLCER {: 
+                                  RESULT= new Program(t,id,listField);
+                                :};
+TYPE ::=                 RESERV_INT:t {:RESULT=t;:};
+			
+
+
+
+STATAMENT_STAR  ::=     STATAMENT:s {:RESULT=new LinkedList<Statement>();:} 
+                        | STATAMENT:s STATAMENT_STAR:listStatament {: listStatament.addFirst(s); RESULT=listStatament;:};
+
+
+
+
+
+STATAMENT ::= 	        	ID:id ASSIG EXPR:expr PUNTOCOMA{:RESULT= new AssignStmt(id,expr);:}
+                			| IF PARENIZQ EXPR:boolExpr PARENDER STATAMENT_STAR:b ELSE_OPTIONAL:else_optional{:RESULT= new IfStmt(boolExpr,b,else_optional);:}
+              			    | WHILE EXPR:boolExpr STATAMENT_STAR:body{:RESULT= new WhileStmt(boolExpr,body);:}
+              			    | RETURN:rt EXPR:expr PUNTOCOMA{:rt.setExpression(expr); RESULT=rt ;:} 
+              			    | PUNTOCOMA:s{:RESULT=s;:};
+
+
+ELSE_OPTIONAL  ::=      ELSE STATAMENT_STAR:b{:RESULT= b;:}
+			               		|{:RESULT= null;:} ;					
+
+
+
+//ASSING_OP  ::=         ASSIG:asign{: RESULT=asign;:};
+
+
+
+EXPR  ::= 		         ID:l {:RESULT=l;:}
+                		| INT:l{:RESULT= l;:}             			
+                        | EXPR:lexpr PLUS:op EXPR:rexpr{:RESULT= new BinOpExpr(lexpr,op,rexpr);:} ;
+
