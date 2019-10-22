@@ -27,6 +27,8 @@ public interface ASTVisitor<T> {
 	
 // visit expressions
 	public T visit(BinOpExpr expr);
+	public T visit(Variable expr);
+
 //	public T visit(ExterninvkCallExpr expr);
 //	public T visit(MethodCallExpr expr);	
 //	public T visit(UnaryOpExpr expr);

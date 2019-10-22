@@ -8,13 +8,6 @@ import ast.*;
     Nombre de la clase .java que crea
 */
 %public %class AnalizadorLexico
-
-/*
-    Activar el contador de lineas, variable yyline
-    Activar el contador de columna, variable yycolumn
-*/
-%line
-%column
     
 /* 
    Activamos la compatibilidad con Java CUP
@@ -39,11 +32,11 @@ import ast.*;
         return new Symbol(type, yyline, yycolumn, value);
     }
 %}
-    
+
 Espacio= [ \t\r\n ] 
 Digit = [0-9]
 Alpha = [a-zA-Z_]
-ASCII = [^"\""] //Todos los caracteres del codigo ASCII que consideramos validos.
+//ASCII = [^"\""] //Todos los caracteres del codigo ASCII que consideramos validos.
 ComentarioLinea= "//".*\n 
 %state COMENTARIO
 %%
@@ -87,22 +80,12 @@ ComentarioLinea= "//".*\n
     "]" {  return  symbol(sym.CORCER);   }
 
     //Identificador  
-    {Alpha} ({Alpha}|{Digit})* {
-    //VarLocation value= new VarLocation(yytext(),yyline,yycolumn);
-                                return symbol(sym.ID);   
-                                }
+    {Alpha} ({Alpha}|{Digit})* { return symbol(sym.ID); }
 
     //Literales
     {Digit}{Digit}* {  return symbol(sym.INT,new IntLiteral(yytext()));   }
-    "/*"        {yybegin(COMENTARIO);     }
 
-      .   {   System.out.println ("Caracter ilegal!!!   " + yytext() + " en linea " + yyline + " columna " + yycolumn);
-      }    
-}
-
-    <COMENTARIO> {
-         {Espacio}  {}
-        "*/"       {yybegin(YYINITIAL); }
-        .           {}
+    {Espacio}  {}
+      
 
      }

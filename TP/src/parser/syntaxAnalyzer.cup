@@ -19,7 +19,7 @@ init with {:
 terminal  ELSE, IF, PARENIZQ, PARENDER,LLAB, LLCER, CORAB, CORCER, WHILE;
 
 terminal String ID;
-terminal RESERV_INT;
+terminal Type RESERV_INT;
 terminal IntLiteral INT;
 terminal PUNTOCOMA;
 terminal AssignOpType ASSIG;
@@ -86,7 +86,7 @@ ELSE_OPTIONAL  ::=      ELSE STATAMENT_STAR:b{:RESULT= b;:}
 
 
 
-EXPR  ::= 		         ID:l {:RESULT=l;:}
+EXPR  ::= 		         ID:l {:RESULT= new Var(l);:}
                 		| INT:l{:RESULT= l;:}             			
                         | EXPR:lexpr PLUS:op EXPR:rexpr{:RESULT= new BinOpExpr(lexpr,op,rexpr);:} ;
 
