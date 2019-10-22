@@ -1,11 +1,14 @@
 package ast;
+
+import java.util.List;
+
 public class IfStmt extends Statement {
 	/**
 	* Class's atributes.
 	*/
 	private Expression condition;
-	private Block ifBlock;
-	private Block elseBlock;
+	private  List<Statement> ifBlock;
+	private  List<Statement> elseBlock;
 	
 	/**
 	* Constructor of an IfStmt object.
@@ -16,7 +19,7 @@ public class IfStmt extends Statement {
 	* @param my_line/my_col - to report an error.
 	*
 	*/
-	public IfStmt(Expression cond, Block ifBl, Block elseBl) {
+	public IfStmt(Expression cond,  List<Statement> ifBl,  List<Statement> elseBl) {
 		this.condition = cond;
 		this.ifBlock = ifBl;
 		this.elseBlock = elseBl;
@@ -51,7 +54,7 @@ public class IfStmt extends Statement {
 	*
 	* @return the IfStmt's block(Block).
 	*/
-	public Block getIfBlock() {
+	public  List<Statement> getIfBlock() {
 		return ifBlock;
 	}
 
@@ -60,7 +63,7 @@ public class IfStmt extends Statement {
 	*
 	* @param ifBlock - the block to be seted
 	*/
-	public void setIfBlock(Block ifBlock) {
+	public void setIfBlock( List<Statement> ifBlock) {
 		this.ifBlock = ifBlock;
 	}
 
@@ -69,7 +72,7 @@ public class IfStmt extends Statement {
 	*
 	* @return the else's block(Block).
 	*/
-	public Block getElseBlock() {
+	public  List<Statement> getElseBlock() {
 		return elseBlock;
 	}
 
@@ -78,7 +81,7 @@ public class IfStmt extends Statement {
 	*
 	* @param elseBlock - the else's block to be seted
 	*/
-	public void setElseBlock(Block elseBlock) {
+	public void setElseBlock( List<Statement> elseBlock) {
 		this.elseBlock = elseBlock;
 	}
 	
