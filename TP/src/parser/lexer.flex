@@ -76,8 +76,7 @@ ComentarioLinea= "//".*\n
     //Llaves.
     "{" {  return  symbol(sym.LLAB);   }
     "}" {  return  symbol(sym.LLCER);   }
-    "[" {  return  symbol(sym.CORAB);   }
-    "]" {  return  symbol(sym.CORCER);   }
+
 
     //Identificador  
     {Alpha} ({Alpha}|{Digit})* { return symbol(sym.ID); }

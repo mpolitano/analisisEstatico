@@ -1,22 +1,34 @@
-package parser;
+package main;
 import java_cup.runtime.*;
 import java.io.FileReader;
 import ast.*;
 import java.util.*;
-import ASTVisitor;
+import java_cup.runtime.Symbol;
+import java.util.Stack;
+import java_cup.runtime.SymbolFactory;
+import java_cup.runtime.Scanner;
+import java_cup.runtime.lr_parser;
 
 
+parser code {:
+	
+    public void syntax_error(Symbol s){
+        System.err.println("\n\nSyntax Error - line: " +  (s.left+1) +  " - value:" + s.value);
+        
+    }
 
 
-init with {:  
-             //We Can't use this block for parser variables inicialization, we should do this in a extra-rule called "begin"
-          :};
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {    
+         System.err.println("\n\nUnrecovered Syntax error line: " +  (s.left+1) +  " - value:" + s.value);
+    }
+                                 	
+:}
 
   
    
 // Terminales (tokens obtenidos por el analizador lexico).  
 
-terminal  ELSE, IF, PARENIZQ, PARENDER,LLAB, LLCER, CORAB, CORCER, WHILE;
+terminal  ELSE, IF, PARENIZQ, PARENDER,LLAB, LLCER, WHILE;
 
 terminal String ID;
 terminal Type RESERV_INT;
@@ -32,8 +44,7 @@ terminal ReturnStmt RETURN;
 non terminal Type TYPE;
 non terminal LinkedList<Statement> STATAMENT_STAR;
 non terminal Statement STATAMENT;
-non terminal Block ELSE_OPTIONAL;
-non terminal AssignOpType ASSING_OP;
+non terminal LinkedList<Statement>  ELSE_OPTIONAL;
 non terminal Expression EXPR;
 non terminal Program PROGRAM;
 
@@ -52,7 +63,6 @@ precedence left  PLUS,RETURN,WHILE,ID;
 // La gramatica 
 
 
-start with PROGRAM;
 
 
 PROGRAM ::=             TYPE:t ID:id LLAB STATAMENT_STAR:listField LLCER {: 
@@ -73,8 +83,7 @@ STATAMENT_STAR  ::=     STATAMENT:s {:RESULT=new LinkedList<Statement>();:}
 STATAMENT ::= 	        	ID:id ASSIG EXPR:expr PUNTOCOMA{:RESULT= new AssignStmt(id,expr);:}
                 			| IF PARENIZQ EXPR:boolExpr PARENDER STATAMENT_STAR:b ELSE_OPTIONAL:else_optional{:RESULT= new IfStmt(boolExpr,b,else_optional);:}
               			    | WHILE EXPR:boolExpr STATAMENT_STAR:body{:RESULT= new WhileStmt(boolExpr,body);:}
-              			    | RETURN:rt EXPR:expr PUNTOCOMA{:rt.setExpression(expr); RESULT=rt ;:} 
-              			    | PUNTOCOMA:s{:RESULT=s;:};
+              			    | RETURN:rt EXPR:expr PUNTOCOMA{:rt.setExpression(expr); RESULT=rt ;:} ;
 
 
 ELSE_OPTIONAL  ::=      ELSE STATAMENT_STAR:b{:RESULT= b;:}
@@ -86,7 +95,7 @@ ELSE_OPTIONAL  ::=      ELSE STATAMENT_STAR:b{:RESULT= b;:}
 
 
 
-EXPR  ::= 		         ID:l {:RESULT= new Var(l);:}
+EXPR  ::= 		         ID:l {:RESULT= new Variable(l);:}
                 		| INT:l{:RESULT= l;:}             			
                         | EXPR:lexpr PLUS:op EXPR:rexpr{:RESULT= new BinOpExpr(lexpr,op,rexpr);:} ;
 
