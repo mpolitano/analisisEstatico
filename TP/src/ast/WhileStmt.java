@@ -14,7 +14,7 @@ public class WhileStmt extends Statement {
 	* Class's atributes.
 	*/
 	private Expression condition;
-	private LinkedList<Statement>  whileBlock;
+	private Block  whileBlock;
 	
 	/**
 	 * Constructor of a WhileStmt object.
@@ -23,7 +23,7 @@ public class WhileStmt extends Statement {
 	 * @param whileBl - the WhileStmt's block
 	 * @param my_line/my_col - to report an error.
 	 */
-	public WhileStmt(Expression cond, LinkedList<Statement> whileBl) {
+	public WhileStmt(Expression cond, Block whileBl) {
 		this.condition = cond;
 		this.whileBlock = whileBl;
 	}
@@ -57,7 +57,7 @@ public class WhileStmt extends Statement {
 	*
 	* @return Block.
 	*/
-	public LinkedList<Statement>  getBlock() {
+	public Block getBlock() {
 		return whileBlock;
 	}
 
@@ -66,7 +66,7 @@ public class WhileStmt extends Statement {
 	*
 	* @param newBlock - the block to be seted.
 	*/
-	public void setBlock(LinkedList<Statement>  newBlock) {
+	public void setBlock(Block newBlock) {
 		this.whileBlock = newBlock;
 	}
 

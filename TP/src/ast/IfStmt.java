@@ -7,8 +7,8 @@ public class IfStmt extends Statement {
 	* Class's atributes.
 	*/
 	private Expression condition;
-	private  List<Statement> ifBlock;
-	private  List<Statement> elseBlock;
+	private  Block ifBlock;
+	private  Block elseBlock;
 	
 	/**
 	* Constructor of an IfStmt object.
@@ -19,7 +19,7 @@ public class IfStmt extends Statement {
 	* @param my_line/my_col - to report an error.
 	*
 	*/
-	public IfStmt(Expression cond,  List<Statement> ifBl,  List<Statement> elseBl) {
+	public IfStmt(Expression cond,  Block ifBl,  Block elseBl) {
 		this.condition = cond;
 		this.ifBlock = ifBl;
 		this.elseBlock = elseBl;
@@ -54,7 +54,7 @@ public class IfStmt extends Statement {
 	*
 	* @return the IfStmt's block(Block).
 	*/
-	public  List<Statement> getIfBlock() {
+	public  Block getIfBlock() {
 		return ifBlock;
 	}
 
@@ -63,7 +63,7 @@ public class IfStmt extends Statement {
 	*
 	* @param ifBlock - the block to be seted
 	*/
-	public void setIfBlock( List<Statement> ifBlock) {
+	public void setIfBlock( Block ifBlock) {
 		this.ifBlock = ifBlock;
 	}
 
@@ -72,7 +72,7 @@ public class IfStmt extends Statement {
 	*
 	* @return the else's block(Block).
 	*/
-	public  List<Statement> getElseBlock() {
+	public  Block getElseBlock() {
 		return elseBlock;
 	}
 
@@ -81,7 +81,7 @@ public class IfStmt extends Statement {
 	*
 	* @param elseBlock - the else's block to be seted
 	*/
-	public void setElseBlock( List<Statement> elseBlock) {
+	public void setElseBlock( Block elseBlock) {
 		this.elseBlock = elseBlock;
 	}
 	

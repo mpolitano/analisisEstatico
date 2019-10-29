@@ -44,7 +44,8 @@ terminal ReturnStmt RETURN;
 non terminal Type TYPE;
 non terminal LinkedList<Statement> STATAMENT_STAR;
 non terminal Statement STATAMENT;
-non terminal LinkedList<Statement>  ELSE_OPTIONAL;
+non terminal Block BLOCK;
+non terminal Block ELSE_OPTIONAL;
 non terminal Expression EXPR;
 non terminal Program PROGRAM;
 
@@ -81,14 +82,20 @@ STATAMENT_STAR  ::=     STATAMENT:s {:RESULT=new LinkedList<Statement>();:}
 
 
 STATAMENT ::= 	        	ID:id ASSIG EXPR:expr PUNTOCOMA{:RESULT= new AssignStmt(id,expr);:}
-                			| IF PARENIZQ EXPR:boolExpr PARENDER STATAMENT_STAR:b ELSE_OPTIONAL:else_optional{:RESULT= new IfStmt(boolExpr,b,else_optional);:}
-              			    | WHILE EXPR:boolExpr STATAMENT_STAR:body{:RESULT= new WhileStmt(boolExpr,body);:}
+                			| IF PARENIZQ EXPR:boolExpr PARENDER BLOCK:b ELSE_OPTIONAL:else_optional{:RESULT= new IfStmt(boolExpr,b,else_optional);:}
+              			    | WHILE EXPR:boolExpr BLOCK:body{:RESULT= new WhileStmt(boolExpr,body);:}
               			    | RETURN:rt EXPR:expr PUNTOCOMA{:rt.setExpression(expr); RESULT=rt ;:} ;
 
 
-ELSE_OPTIONAL  ::=      ELSE STATAMENT_STAR:b{:RESULT= b;:}
+ELSE_OPTIONAL  ::=      ELSE BLOCK:b{:RESULT= b;:}
 			               		|{:RESULT= null;:} ;					
 
+BLOCK  ::=              LLAB STATAMENT_STAR:listStatament LLCER
+                            {:
+                               RESULT= new Block(listStatament); 
+                            :};
+                        
+                     
 
 
 //ASSING_OP  ::=         ASSIG:asign{: RESULT=asign;:};
