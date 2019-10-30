@@ -31,8 +31,7 @@ parser code {:
 terminal  ELSE, IF, PARENIZQ, PARENDER,LLAB, LLCER, WHILE;
 
 terminal String ID;
-terminal Type RESERV_INT;
-terminal IntLiteral INT;
+terminal INT;
 terminal PUNTOCOMA;
 terminal AssignOpType ASSIG;
 terminal BinOpType  PLUS;
@@ -42,6 +41,7 @@ terminal ReturnStmt RETURN;
 // No Terminales (producciones).  
                         
 non terminal Type TYPE;
+terminal Integer INTEGER;
 non terminal LinkedList<Statement> STATAMENT_STAR;
 non terminal Statement STATAMENT;
 non terminal Block BLOCK;
@@ -50,10 +50,10 @@ non terminal Expression EXPR;
 non terminal Program PROGRAM;
 
 
-precedence left  ELSE,IF;
-precedence left  PUNTOCOMA;
 
-precedence left  PLUS,RETURN,WHILE,ID;
+
+precedence left  PLUS;
+precedence left PARENIZQ, PARENDER;
 
 
 // -------------Seccion de predencia y asociacion de los terminales----------- 
@@ -66,10 +66,11 @@ precedence left  PLUS,RETURN,WHILE,ID;
 
 
 
-PROGRAM ::=             TYPE:t ID:id LLAB STATAMENT_STAR:listField LLCER {: 
+PROGRAM ::=             TYPE:t ID:id PARENIZQ PARENDER LLAB STATAMENT_STAR:listField LLCER {: 
                                   RESULT= new Program(t,id,listField);
                                 :};
-TYPE ::=                 RESERV_INT:t {:RESULT=t;:};
+TYPE ::=                 INT
+;
 			
 
 
@@ -103,6 +104,6 @@ BLOCK  ::=              LLAB STATAMENT_STAR:listStatament LLCER
 
 
 EXPR  ::= 		         ID:l {:RESULT= new Variable(l);:}
-                		| INT:l{:RESULT= l;:}             			
+                		| INTEGER:i{:Expression e = new IntLiteral(i);  RESULT= e;:}             			
                         | EXPR:lexpr PLUS:op EXPR:rexpr{:RESULT= new BinOpExpr(lexpr,op,rexpr);:} ;
 

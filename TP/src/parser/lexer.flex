@@ -1,4 +1,4 @@
-package parser;
+package main;
 import java_cup.runtime.*;
 import java.io.Reader;
 import ast.*;      
@@ -38,8 +38,11 @@ Digit = [0-9]
 Alpha = [a-zA-Z_]
 //ASCII = [^"\""] //Todos los caracteres del codigo ASCII que consideramos validos.
 ComentarioLinea= "//".*\n 
+//Literales
+integer = {Digit}{Digit}*	
 %state COMENTARIO
 %%
+
 
 <YYINITIAL> {
     /* Regresa que el token la palabra reservada. */
@@ -70,9 +73,10 @@ ComentarioLinea= "//".*\n
     ";" {  return  symbol(sym.PUNTOCOMA); }
 
     //Tipos
-    "int" {Type t=Type.INT; return symbol(sym.RESERV_INT,t);}
-
-    
+     "integer" { 
+         return new Symbol(sym.INT,yytext());
+      }
+      
     //Llaves.
     "{" {  return  symbol(sym.LLAB);   }
     "}" {  return  symbol(sym.LLCER);   }
@@ -81,9 +85,14 @@ ComentarioLinea= "//".*\n
     //Identificador  
     {Alpha} ({Alpha}|{Digit})* { return symbol(sym.ID); }
 
-    //Literales
-    {Digit}{Digit}* {  return symbol(sym.INT,new IntLiteral(yytext()));   }
 
+	{integer} {  
+	     Integer value = new Integer(yytext());
+         return new Symbol(sym.INTEGER,value);
+      }
+      
+
+      
     {Espacio}  {}
       
 

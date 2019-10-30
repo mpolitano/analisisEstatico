@@ -12,7 +12,7 @@ public class IntLiteral extends Expression {
 	/**
 	* Class's atributes.
 	*/
-	private int value;
+	private Integer value;
 	
 	/**
 	 * Constructor of a IntLiteral object.
@@ -20,8 +20,8 @@ public class IntLiteral extends Expression {
 	 * @param: val - the IntLiteral's value in String.
 	 * @param my_line/my_col - to report an error.
 	 */
-	public IntLiteral(String val){
-		value = Integer.parseInt(val);//Parses the string argument as a signed decimal integer.
+	public IntLiteral(Integer val){
+		value = val;//Parses the string argument as a signed decimal integer.
 
 	}
 
