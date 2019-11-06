@@ -20,6 +20,7 @@ public class IfStmt extends Statement {
 	*
 	*/
 	public IfStmt(Expression cond,  Block ifBl,  Block elseBl) {
+		System.out.println("Creating if stmt -> cond:" + cond.toString() + "ifBlock: " + ifBl.toString() + "elseBl: " + elseBl.toString());
 		this.condition = cond;
 		this.ifBlock = ifBl;
 		this.elseBlock = elseBl;
