@@ -31,19 +31,20 @@ parser code {:
 terminal  ELSE, IF, PARENIZQ, PARENDER,LLAB, LLCER, WHILE;
 
 terminal String ID;
-terminal INT;
 terminal PUNTOCOMA;
 terminal AssignOpType ASSIG;
 terminal BinOpType  PLUS;
 terminal ReturnStmt RETURN;
+terminal IntLiteral INT;
+
 
 
 // No Terminales (producciones).  
                         
 non terminal Type TYPE;
 terminal Integer INTEGER;
-non terminal LinkedList<Statement> STATAMENT_STAR;
-non terminal Statement STATAMENT;
+non terminal LinkedList<Statement> STATEMENT_STAR;
+non terminal Statement STATEMENT;
 non terminal Block BLOCK;
 non terminal Block ELSE_OPTIONAL;
 non terminal Expression EXPR;
@@ -66,34 +67,33 @@ precedence left PARENIZQ, PARENDER;
 
 
 
-PROGRAM ::=             TYPE:t ID:id PARENIZQ PARENDER LLAB STATAMENT_STAR:listField LLCER {: 
+PROGRAM ::=             TYPE:t ID:id PARENIZQ PARENDER LLAB STATEMENT_STAR:listField LLCER {: 
                                   RESULT= new Program(t,id,listField);
                                 :};
-TYPE ::=                 INT
-;
+TYPE ::=                 INT;
 			
 
 
 
-STATAMENT_STAR  ::=     STATAMENT:s {:RESULT=new LinkedList<Statement>();:} 
-                        | STATAMENT:s STATAMENT_STAR:listStatament {: listStatament.addFirst(s); RESULT=listStatament;:};
+STATEMENT_STAR  ::=     STATEMENT:s {: RESULT=new LinkedList<Statement>(); RESULT.addFirst(s); :} 
+                        | STATEMENT:s STATEMENT_STAR:listStatement {: listStatement.addFirst(s); RESULT=listStatement;:};
 
 
 
 
 
-STATAMENT ::= 	        	ID:id ASSIG EXPR:expr PUNTOCOMA{:RESULT= new AssignStmt(id,expr);:}
+STATEMENT ::= 	        	ID:id ASSIG EXPR:expr PUNTOCOMA{:RESULT= new AssignStmt(id,expr);:}
                 			| IF PARENIZQ EXPR:boolExpr PARENDER BLOCK:b ELSE_OPTIONAL:else_optional{:RESULT= new IfStmt(boolExpr,b,else_optional);:}
-              			    | WHILE EXPR:boolExpr BLOCK:body{:RESULT= new WhileStmt(boolExpr,body);:}
+              			    | WHILE  PARENIZQ EXPR:boolExpr PARENDER BLOCK:body{:RESULT= new WhileStmt(boolExpr,body);:}
               			    | RETURN:rt EXPR:expr PUNTOCOMA{:rt.setExpression(expr); RESULT=rt ;:} ;
 
 
 ELSE_OPTIONAL  ::=      ELSE BLOCK:b{:RESULT= b;:}
 			               		|{:RESULT= null;:} ;					
 
-BLOCK  ::=              LLAB STATAMENT_STAR:listStatament LLCER
+BLOCK  ::=              LLAB STATEMENT_STAR:listStatement LLCER
                             {:
-                               RESULT= new Block(listStatament); 
+                               RESULT= new Block(listStatement); 
                             :};
                         
                      

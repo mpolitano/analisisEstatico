@@ -83,7 +83,8 @@ integer = {Digit}{Digit}*
 
 
     //Identificador  
-    {Alpha} ({Alpha}|{Digit})* { return symbol(sym.ID); }
+    {Alpha} ({Alpha}|{Digit})* { 
+    return symbol(sym.ID, yytext()); }
 
 
 	{integer} {  

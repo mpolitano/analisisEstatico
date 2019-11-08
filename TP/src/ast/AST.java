@@ -4,7 +4,6 @@
 *
 * It is abstract because many of the class which inherit of him will implements more methods or use those who are already done.
 *
-* @autor cornejo-politano-raverta.
 *
 */
 package ast;
