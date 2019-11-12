@@ -1,8 +1,11 @@
 package graphs;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
 public class CFG {
@@ -48,6 +51,10 @@ public class CFG {
 		this.outNodes.add(n);
 	}
 	
+	public void setOutNode(List<Node> nodes){
+		this.outNodes = nodes;
+	}
+	
 	public Node getInNode(){
 		return this.inNode;
 	}
@@ -85,12 +92,47 @@ public class CFG {
 	public void concatGraph(CFG graph){
 		addAllNodes(graph);
 		addAllEdges(graph);
-		for (Node n : getOutNodes()){
+		for (Node n : this.getOutNodes()){
 			cfg.addEdge(n, graph.getInNode(), new Edge());
 		}
-		for (Node n : graph.getOutNodes()){
-			addOutNode(n);
+		//for (Node n : graph.getOutNodes()){
+		//	addOutNode(n);
+		//}
+		if (this.getInNode() == null) {
+			this.setInNode(graph.getInNode());
 		}
+		this.setOutNode(graph.getOutNodes());
+	}
+	
+	
+	/*public void exportToDot(String fileName) {
+    try {
+        // Defines the vertex id to be displayed in the .gv file
+    	IntegerComponentNameProvider<N> vertexId = new IntegerComponentNameProvider<N>(){
+            public String getVertexName(N p) {
+                return "0";
+            }
+        };
+        // Defines the vertex label to be displayed in the .gv file
+        StringComponentNameProvider<N> vertexLabel = new StringComponentNameProvider<N>(){
+            
+			public String getVertexName(N p) {
+                return p.toString();
+            }
+        };
+        // Just us a default edge label
+        StringComponentNameProvider<E> edgeLabel = new StringComponentNameProvider<E>();	        
+        DOTExporter<N, E> dot = new DOTExporter<N, E>(vertexId, vertexLabel, edgeLabel, null, null);
+        dot.exportGraph(cfg, new FileWriter(fileName));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}*/
+	
+	public void toDot(String fileName) throws IOException{
+		FileWriter f = new FileWriter(fileName);
+		DOTExporter<Node, Edge> dot = new DOTExporter<Node, Edge>();
+		dot.exportGraph(cfg, f);
 	}
 	
 }

@@ -30,55 +30,54 @@ public class ASTtoCFGVisitor implements ASTVisitor<CFG>{
 			CFG partialResult = s.accept(v);
 			result.concatGraph(partialResult);
 		}
-	//	finalCFG = prog.accept(this);
 		return result;
 	}
 
 	@Override
 	public CFG visit(ReturnStmt r) {
 		Node node = new Node(r);
-		CFG graph = new CFG();
-		graph.addNode(node);
-		return graph;
+		CFG result = new CFG();
+		result.addNode(node);
+		result.addOutNode(node);
+		result.setInNode(node);
+		return result;
 	}
 
 	@Override
 	public CFG visit(AssignStmt stmt) {
 		Node node = new Node(stmt);
-		CFG graph = new CFG();
-		graph.addNode(node);
-		return graph;
+		CFG result = new CFG();
+		result.addNode(node);
+		result.addOutNode(node);
+		result.setInNode(node);
+		return result;
 	}
 
 	@Override
 	public CFG visit(IfStmt stmt) {
-		System.out.println("in if stmt : " + stmt.toString());
 		CFG result = new CFG();
-		Node condition = new Node(stmt.getCondition());
-		//result.addNode(condition);
-		//result.setInNode(condition);
+		Node condition = new Node(stmt.getCondition());		
 		
 		CFG thenCFG = new CFG();
 		ASTtoCFGVisitor v1 = new ASTtoCFGVisitor();
 		thenCFG = stmt.getIfBlock().accept(v1);
-		System.out.println(stmt.getIfBlock());
 		
 		CFG elseCFG = new CFG();
 		ASTtoCFGVisitor v2 = new ASTtoCFGVisitor();
 		elseCFG = stmt.getElseBlock().accept(v2);
 
 		result.addNode(condition);
+		result.setInNode(condition);
 		
 		result.addAllNodes(thenCFG);
 		result.addAllEdges(thenCFG);
-		System.out.println(thenCFG.getGraph().vertexSet());
 		result.addEdge(condition, thenCFG.getInNode());
+		
 		
 		result.addAllNodes(elseCFG);
 		result.addAllEdges(elseCFG);
 		result.addEdge(condition, elseCFG.getInNode());
 		
-		result.setInNode(condition);
 		for (Node n : thenCFG.getOutNodes()){
 			result.addOutNode(n);
 		}
@@ -97,7 +96,7 @@ public class ASTtoCFGVisitor implements ASTVisitor<CFG>{
 			CFG partialCFG = s.accept(v);
 			result.concatGraph(partialCFG);
 		}
-		// TODO Auto-generated method stub
+
 		return result;
 	}
 
@@ -106,10 +105,16 @@ public class ASTtoCFGVisitor implements ASTVisitor<CFG>{
 		Node condition = new Node (stmt.getCondition());
 		
 		CFG result = stmt.getBlock().accept(this);
+		result.addNode(condition);
+		result.addEdge(condition, result.getInNode());
+		result.setInNode(condition);
 		
+		for (Node n : result.getOutNodes()){
+			result.addEdge(n, condition);
+		}
 		
+		result.addOutNode(condition);
 		
-		// TODO Auto-generated method stub
 		return result;
 	}
 
@@ -118,6 +123,8 @@ public class ASTtoCFGVisitor implements ASTVisitor<CFG>{
 		Node node = new Node(expr);
 		CFG result = new CFG();
 		result.addNode(node);
+		result.addOutNode(node);
+		result.setInNode(node);
 		return result;
 	}
 
@@ -126,6 +133,8 @@ public class ASTtoCFGVisitor implements ASTVisitor<CFG>{
 		Node node = new Node (expr);
 		CFG result = new CFG();
 		result.addNode(node);
+		result.addOutNode(node);
+		result.setInNode(node);
 		return result;
 	}
 
@@ -134,6 +143,8 @@ public class ASTtoCFGVisitor implements ASTVisitor<CFG>{
 		Node node = new Node (lit);
 		CFG result = new CFG();
 		result.addNode(node);
+		result.addOutNode(node);
+		result.setInNode(node);
 		return result;
 	}
 

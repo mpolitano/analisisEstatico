@@ -1,6 +1,17 @@
 integer f(){ x=3;
   if (y) {
      z = x+1;
-} else{
-y = x+z; }
-return z; }
+     x = x +1 ;
+} else {
+	x = z;
+	x = x + 1;
+}
+
+y = z;
+while (y){
+	x = x + 1;
+	z = x;
+}
+
+return x;
+ }
