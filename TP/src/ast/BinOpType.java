@@ -15,7 +15,11 @@ public enum BinOpType {
 	* The values of the class enumeration.
 	*
 	*/
-	PLUS, // Arithmetic
+	PLUS{
+		public String toString(){
+			return "+";
+		}
+	} // Arithmetic
 
 
 //	/**
@@ -32,4 +36,7 @@ public enum BinOpType {
 //		
 //		return null;
 //	}
+	
+	
+	
 }

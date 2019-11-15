@@ -11,5 +11,5 @@ package ast;
 
 public abstract class Statement extends AST {
 	
-	
+	public abstract String toString();
 }
