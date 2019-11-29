@@ -12,12 +12,16 @@ import java.util.Set;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import ast.Program;
+
 public class CFG {
 
 	//the graph
 	DefaultDirectedGraph<Node,Edge> cfg;
 	
 	String programName;
+	
+	Program program;
 	
 	//Start Node
 	Node inNode;
@@ -36,6 +40,10 @@ public class CFG {
 	
 	public void setCFG(DefaultDirectedGraph<Node, Edge> graph){
 		cfg = graph;
+	}
+	
+	public void setProgram(Program p){
+		this.program = p;
 	}
 	
 	public void addNode(Node node){
@@ -261,17 +269,76 @@ public class CFG {
 		entry.markAsEntry();
 		augmentedCFG.cfg.addVertex(entry);
 		augmentedCFG.cfg.addEdge(start, entry, new Edge(true));
-
+		
+		augmentedCFG.cfg.addEdge(entry, this.inNode, new Edge());
+		
 		Node fin = new Node();
 		fin.markAsEntry();
 		augmentedCFG.cfg.addVertex(fin);
 		augmentedCFG.cfg.addEdge(start, fin, new Edge(false));
-
+		
 		for (Edge e : cfg.edgeSet()){
 			augmentedCFG.cfg.addEdge(cfg.getEdgeSource(e), cfg.getEdgeTarget(e), new Edge());
 		}
 		
+		for (Node n : outNodes){
+			augmentedCFG.cfg.addEdge(n, fin, new Edge());
+		}
+		
+		augmentedCFG.addOutNode(fin);
+		
 		return augmentedCFG;
+	}
+
+	
+	public void computeGenAndKill(){
+		for (Node n : cfg.vertexSet()){
+			n.computeGen();
+			n.computeKill(program.getMethods());
+		}
+	}
+	
+	/**
+	 * 
+	 * for each node n do OUT[n] = GEN[n] endfor
+	 * change = true
+	 * while change do
+	 * 	change = false
+	 *  for each node n do 
+	 *  	IN[n] = U OUT[P] P = inmediate preds of n
+	 *  	OLDUT = OUT[n]
+	 *  	OUT[n] = GEN[n] U (IN[n]-KILL[n])
+	 *  	if OUT[n] != OLDOUT then change = true endif
+	 *  endfor
+	 * endwhile 
+	 * 
+	 */
+	public void reachingDefs(){
+		for (Node n : cfg.vertexSet()){
+			n.setOut(new HashSet<Def>(n.getGen()));
+			//since OUT[n] == GEN[n] page 5
+		}
+		boolean change = true;
+		while (change){
+			change = false;
+			for (Node n : cfg.vertexSet()){
+				Set<Node> pred = predecessors(n);
+				Set<Def> in = new HashSet<Def>();
+				for (Node p : pred){
+					in.addAll(new HashSet<Def>(p.getOut()));
+				}
+				n.setIn(in);
+				Set<Def> oldOuts = n.getOut();
+				Set<Def> finalOuts = new HashSet<Def>(n.getIn());
+				finalOuts.removeAll(n.getKill());
+				finalOuts.addAll(n.getGen());
+				n.setOut(finalOuts);
+				if (!finalOuts.equals(oldOuts)){
+					//some changes
+					change = true;
+				}
+			}
+		}
 	}
 	
 	public void toDot(String fileName) throws IOException{

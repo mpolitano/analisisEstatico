@@ -46,7 +46,17 @@ public class Main {
 			CFG toPrint = new CFG();
 			toPrint.setCFG(posDomTree);
 			toPrint.toDot(fileName);
-
+			
+			System.out.println("Starting Reaching Definitions (Data flow analysis)");
+			cfg.setProgram(result);
+			cfg.computeGenAndKill();
+			System.out.println("Gen and Kill ready");
+			cfg.reachingDefs();
+			System.out.println("Reaching defs ready");
+			System.out.println("Results of reaching defs algorithm : ");
+			for (Node n : cfg.getGraph().vertexSet()){
+				n.showReachingDefResult();
+			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
             e.printStackTrace(System.out);
