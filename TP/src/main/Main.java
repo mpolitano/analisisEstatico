@@ -43,18 +43,18 @@ public class Main {
 			System.out.println("post dominadores: " + cfg.postDom().toString());
 			
 			
-			DefaultDirectedGraph<Node, Edge> posDomTree = cfg.postDomTree();
+			CFG posDomTree = cfg.postDomTree();
 			fileName = "postDomTree.dot";
 			f = new FileWriter(fileName);
 			System.out.println("--> Post dominator tree successfully created in TP/postDomTree.dot ");
 			CFG toPrint = new CFG();
-			toPrint.setCFG(posDomTree);
+			//toPrint.setCFG(posDomTree);
 			toPrint.toDot(fileName);
 			System.out.println("--> Control Dependence Graph <--");
 			fileName = "controlDependenceGraph.dot";
 			f = new FileWriter(fileName);
 			System.out.println("--> Control Dependence Graph successfully created in TP/controlDependenceGraph.dot ");
-			CDG cdg = new CDG(cfg.getAugmentedCFG(), posDomTree);
+			CDG cdg = new CDG(cfg.getAugmentedCFG(), cfg.getAugmentedCFG().postDomTree());
 			cdg.toDot(fileName);
 			
 			

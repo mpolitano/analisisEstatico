@@ -232,10 +232,10 @@ public class CFG {
 	 * ACLARACION: da un arbol (como grafo)
 	 * @return
 	 */
-	public DefaultDirectedGraph<Node, Edge> postDomTree(){
+	public CFG postDomTree(){
 		CFG reverse = reverse();
 		Map<Node, Set<Node>> postDominators = postDom();
-		DefaultDirectedGraph<Node, Edge> tree = new DefaultDirectedGraph<Node, Edge>(Edge.class); 
+		CFG tree = new CFG(); 
 		LinkedList<Node> queue = new LinkedList<Node>();
 		queue.addLast(reverse.getInNode());
 		for (Node n : reverse.cfg.vertexSet()){
@@ -251,8 +251,8 @@ public class CFG {
 					if (dominators.contains(node)){
 						dominators.remove(node);
 						if (dominators.isEmpty()){
-							tree.addVertex(node);
-							tree.addVertex(n);
+							tree.addNode(node);
+							tree.addNode(n);
 							tree.addEdge(node, n);
 							queue.addLast(n);
 						}
@@ -414,6 +414,47 @@ public class CFG {
 		return result;
 	}
 	
+	
+	public CFG getSubGraph(Node start, Node end) {
+		// start can't be a join node neither end a split node
+//		assert((start.nodeType!=CFGNodeTypes.JOIN) && (end.nodeType!=CFGNodeTypes.SPLIT));
+		CFG result = new CFG(); 
+		// build and collect all nodes and edges of the sub graph 
+		HashSet<Node> nodes = new HashSet<Node>();
+		HashSet<Edge> edges = new HashSet<Edge>();
+		// queue of nodes of the subgraph to analyze
+		LinkedList <Node> todo = new LinkedList<Node>();
+		todo.add(start);
+		//while the "end" node hasn't reached get successors nodes and regarding edges recursively
+		while (!todo.isEmpty()) {
+			Node node = todo.poll(); 
+			//add this node
+			nodes.add(node);
+			for (Edge e : getGraph().edgesOf(node)) {
+				if((getGraph().getEdgeSource(e)==node) && (node !=end)) {
+					//add outgoing edges 
+					edges.add(e);
+					//if the successor is not the end and not yet collected, add to process
+					Node succNode = getGraph().getEdgeTarget(e);
+					if (!result.cfg.vertexSet().contains(succNode) && succNode != end) {
+						todo.add(succNode);
+					}
+				}
+			}	
+		}
+		//add the end node
+		result.addNode(end);
+		// ---- generate the subgraph ---- (in second phase because edges can't be added if the corresponding node don't exists)
+		//put the nodes 
+		for(Node n:nodes) result.addNode(n);
+		//put  edges
+		for(Edge e:edges) result.addEdge(getGraph().getEdgeSource(e),getGraph().getEdgeTarget(e));
+	    result.setInNode(start);
+	    result.addOutNode(end);
+	     Set<Node> b = result.getGraph().vertexSet();
+	    // return the instantiated graph
+		return result;	
+	}
 	
 	public void toDot(String fileName) throws IOException{
 		FileWriter f = new FileWriter(fileName);
