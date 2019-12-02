@@ -12,7 +12,12 @@ import java.util.Set;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
+import ast.AssignStmt;
+import ast.IfStmt;
 import ast.Program;
+import ast.ReturnStmt;
+import ast.Statement;
+import ast.WhileStmt;
 
 public class CFG {
 
@@ -144,6 +149,11 @@ public class CFG {
     }
 }*/
 	
+	/**
+	 * The set of predecessors nodes of n in a graph
+	 * @param n
+	 * @return
+	 */
 	private Set<Node> predecessors (Node n){
 		Set<Node> result = new HashSet<Node> ();
 		for (Edge e : cfg.edgeSet()){
@@ -340,6 +350,70 @@ public class CFG {
 			}
 		}
 	}
+	
+	public Set<Statement> getUpExpUses(Node n){
+		HashSet<Statement> upExpUses = new HashSet<Statement>();
+		for (Def d : n.getIn()){
+			AssignStmt s = (AssignStmt) d.getStmt();
+			for (Node node : predecessors(n)){
+				if(use(node.stmt, s.getID())){
+					upExpUses.add(node.stmt);
+				}
+			}
+		}
+		return upExpUses;
+	}
+	
+	
+	private boolean use(Statement s, String var){
+		if (s instanceof AssignStmt) {
+			return s.toString().contains(var) && !((AssignStmt)s).getID().contains(var);
+		} else 
+			if (s instanceof IfStmt){
+				return ((IfStmt) s).getCondition().toString().contains(var);
+			} else
+				if (s instanceof WhileStmt){
+					return ((WhileStmt) s).getCondition().toString().contains(var);
+				} else
+					if (s instanceof ReturnStmt){
+						return s.toString().contains(var);
+					}
+		return false;
+	}
+	
+	private boolean defUseVariable(Def d, Statement s){
+		if (d.getStmt() instanceof AssignStmt) {
+			String stmtVar = ((AssignStmt) d.getStmt()).getID();
+			if (s instanceof AssignStmt){
+				return !((AssignStmt)s).getID().equals(stmtVar) && ((AssignStmt)s).getExpression().toString().contains(stmtVar);
+			} else 
+				if (s instanceof IfStmt) {
+					return ((IfStmt) s).getCondition().toString().equals(stmtVar);
+		      } else 
+		    	  if (s instanceof WhileStmt) {
+		    		  return ((WhileStmt) s).getCondition().toString().equals(stmtVar);
+		      } else 
+		    	  if (s instanceof ReturnStmt) {
+		    		  return ((ReturnStmt) s).getExpression().toString().contains(stmtVar);
+		    	  }
+		}
+		return false;
+	}
+	
+	public Set<DefUsePair> defUsePairs(){
+		HashSet<DefUsePair> result = new HashSet<DefUsePair>();
+		for (Node n : cfg.vertexSet()){
+			Set<Statement> upExposed = getUpExpUses(n);
+			for (Statement usedStmt : upExposed){
+				for (Def d : n.getIn()){
+					if(defUseVariable(d, usedStmt))
+						result.add(new DefUsePair(d.getStmt(),d.getNode(), usedStmt, n));
+				}
+			}
+		}
+		return result;
+	}
+	
 	
 	public void toDot(String fileName) throws IOException{
 		FileWriter f = new FileWriter(fileName);

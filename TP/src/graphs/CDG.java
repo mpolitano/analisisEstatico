@@ -1,5 +1,9 @@
 package graphs;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
 public class CDG {
@@ -23,6 +27,12 @@ public class CDG {
 		// consultar algoritmo. creo que termina ahí (ver T y F de los edges)
 		
 		
+	}
+	
+	public void toDot(String fileName) throws IOException{
+		FileWriter f = new FileWriter(fileName);
+		DOTExporter<Node, Edge> dot = new DOTExporter<Node, Edge>();
+		dot.exportGraph(cdg, f);
 	}
 	
 }
