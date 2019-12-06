@@ -12,4 +12,12 @@ public class Edge extends DefaultEdge {
 		kind = value;
 	}
 	
+	public Edge (Edge e) {
+		super(e);
+	}
+	
+	public Edge (Node e, Node e1) {
+		
+	}
+	
 }

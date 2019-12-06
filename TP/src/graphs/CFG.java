@@ -18,6 +18,7 @@ import ast.Program;
 import ast.ReturnStmt;
 import ast.Statement;
 import ast.WhileStmt;
+import tree.Tree;
 
 public class CFG {
 
@@ -125,30 +126,7 @@ public class CFG {
 	}
 	
 	
-	/*public void exportToDot(String fileName) {
-    try {
-        // Defines the vertex id to be displayed in the .gv file
-    	IntegerComponentNameProvider<N> vertexId = new IntegerComponentNameProvider<N>(){
-            public String getVertexName(N p) {
-                return "0";
-            }
-        };
-        // Defines the vertex label to be displayed in the .gv file
-        StringComponentNameProvider<N> vertexLabel = new StringComponentNameProvider<N>(){
-            
-			public String getVertexName(N p) {
-                return p.toString();
-            }
-        };
-        // Just us a default edge label
-        StringComponentNameProvider<E> edgeLabel = new StringComponentNameProvider<E>();	        
-        DOTExporter<N, E> dot = new DOTExporter<N, E>(vertexId, vertexLabel, edgeLabel, null, null);
-        dot.exportGraph(cfg, new FileWriter(fileName));
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}*/
-	
+
 	/**
 	 * The set of predecessors nodes of n in a graph
 	 * @param n
@@ -164,6 +142,20 @@ public class CFG {
 		return result;
 	}
 	
+	/**
+	 * The set of predecessors nodes of n in a graph
+	 * @param n
+	 * @return
+	 */
+	private Set<Node> ancestors (Node n){
+		Set<Node> result = new HashSet<Node> ();
+		for (Edge e : cfg.edgeSet()){
+			if (n.equals(cfg.getEdgeSource(e))){
+				result.add(cfg.getEdgeTarget(e));
+			}
+		}
+		return result;
+	}
 	private Set<Node> intersecPred (Node n, Map<Node, Set<Node>> dominators){
 		Set<Node> intersection = new HashSet<Node>();
 		Set<Node> preds = predecessors(n);
@@ -238,6 +230,7 @@ public class CFG {
 		CFG tree = new CFG(); 
 		LinkedList<Node> queue = new LinkedList<Node>();
 		queue.addLast(reverse.getInNode());
+		tree.inNode=reverse.getInNode();
 		for (Node n : reverse.cfg.vertexSet()){
 			Set<Node> dominators = postDominators.get(n);
 			dominators.remove(n);
@@ -415,46 +408,27 @@ public class CFG {
 	}
 	
 	
-	public CFG getSubGraph(Node start, Node end) {
-		// start can't be a join node neither end a split node
-//		assert((start.nodeType!=CFGNodeTypes.JOIN) && (end.nodeType!=CFGNodeTypes.SPLIT));
-		CFG result = new CFG(); 
-		// build and collect all nodes and edges of the sub graph 
-		HashSet<Node> nodes = new HashSet<Node>();
-		HashSet<Edge> edges = new HashSet<Edge>();
-		// queue of nodes of the subgraph to analyze
-		LinkedList <Node> todo = new LinkedList<Node>();
-		todo.add(start);
-		//while the "end" node hasn't reached get successors nodes and regarding edges recursively
-		while (!todo.isEmpty()) {
-			Node node = todo.poll(); 
-			//add this node
-			nodes.add(node);
-			for (Edge e : getGraph().edgesOf(node)) {
-				if((getGraph().getEdgeSource(e)==node) && (node !=end)) {
-					//add outgoing edges 
-					edges.add(e);
-					//if the successor is not the end and not yet collected, add to process
-					Node succNode = getGraph().getEdgeTarget(e);
-					if (!result.cfg.vertexSet().contains(succNode) && succNode != end) {
-						todo.add(succNode);
-					}
-				}
-			}	
+	
+	public List<Set<Node>> caminos(Node to, Node from){
+		List<Set<Node>> result = new LinkedList<Set<Node>>();
+		Set<Node> caminoParcial = new HashSet<Node>();
+		Set<Edge> visited = new HashSet<Edge>();
+		if (to.equals(from)) {
+			return result;
 		}
-		//add the end node
-		result.addNode(end);
-		// ---- generate the subgraph ---- (in second phase because edges can't be added if the corresponding node don't exists)
-		//put the nodes 
-		for(Node n:nodes) result.addNode(n);
-		//put  edges
-		for(Edge e:edges) result.addEdge(getGraph().getEdgeSource(e),getGraph().getEdgeTarget(e));
-	    result.setInNode(start);
-	    result.addOutNode(end);
-	     Set<Node> b = result.getGraph().vertexSet();
-	    // return the instantiated graph
-		return result;	
+		
+		
+		return result;
 	}
+	
+    public Tree<Statement> toTree(){
+    	Tree<Statement> result = new Tree(this.getInNode());
+    	for (Edge e : this.getGraph().edgeSet()){
+    			result.addChild(this.getGraph().getEdgeTarget(e),this.getGraph().getEdgeSource(e));
+    			}
+    	return result;
+    	}
+	
 	
 	public void toDot(String fileName) throws IOException{
 		FileWriter f = new FileWriter(fileName);

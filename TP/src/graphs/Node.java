@@ -10,11 +10,34 @@ import ast.IfStmt;
 import ast.Statement;
 import ast.WhileStmt;
 
-public class Node {
+public class Node<E> {
 
 	Statement stmt;
 	
 	Expression expr;
+	
+	 private Node parent;
+	    private boolean visited;
+
+	    
+	   
+	    public void setParent(Node p) {
+	      this.parent = p;
+	    }
+	    
+	    public Node getParent() {
+	        return parent;
+	      }
+
+	    public void setVisited(boolean b) {
+	      this.visited = b;
+	    }
+
+
+	    public boolean getVisited() {
+	      return visited;
+	    }
+
 	
 	public boolean start = false;
 	
@@ -30,6 +53,8 @@ public class Node {
 	
 	public Set<Def> out;
 	
+	public boolean mark = false;
+	
 	public Node(){}
 	
 	public Node(Statement stmt){
@@ -40,6 +65,13 @@ public class Node {
 		this.expr = expr;
 	}
 	
+	public Statement getStmt() {
+		return this.stmt;
+	}
+	
+	public void setStmt(Statement stmt) {
+		this.stmt = stmt;
+	}
 	public void markAsStart(){
 		start = true;
 	}
