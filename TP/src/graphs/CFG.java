@@ -346,8 +346,8 @@ public class CFG {
 	
 	public Set<Statement> getUpExpUses(Node n){
 		HashSet<Statement> upExpUses = new HashSet<Statement>();
-		for (Def d : n.getIn()){
-			AssignStmt s = (AssignStmt) d.getStmt();
+		for (Object d : n.getIn()){
+			AssignStmt s = (AssignStmt) ((Def) d).getStmt();
 			for (Node node : predecessors(n)){
 				if(use(node.stmt, s.getID())){
 					upExpUses.add(node.stmt);
@@ -398,9 +398,9 @@ public class CFG {
 		for (Node n : cfg.vertexSet()){
 			Set<Statement> upExposed = getUpExpUses(n);
 			for (Statement usedStmt : upExposed){
-				for (Def d : n.getIn()){
-					if(defUseVariable(d, usedStmt))
-						result.add(new DefUsePair(d.getStmt(),d.getNode(), usedStmt, n));
+				for (Object d : n.getIn()){
+					if(defUseVariable(((Def)d), usedStmt))
+						result.add(new DefUsePair(((Def)d).getStmt(),((Def)d).getNode(), usedStmt, n));
 				}
 			}
 		}
